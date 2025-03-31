@@ -23,6 +23,7 @@ This is a Node.js backend project that provides secure image upload functionalit
 - **Multer** (File upload middleware)
 - **bcrypt.js** (Password hashing for security)
 - **Vercel & Render** (Cloud deployment platforms)
+![Image Diagram Flow](https://github.com/Harsh5225/Auth-nodejs/blob/main/diagram.png)
 
 ## Installation & Setup
 
