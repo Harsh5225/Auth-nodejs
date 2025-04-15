@@ -1,6 +1,7 @@
 import { user } from "../models/user.js";
 import bcrypt, { genSalt } from "bcryptjs";
 import jwt from "jsonwebtoken";
+import client from "../database/redisdb.js";
 export const register = async (req, res) => {
   try {
     const { userName, email, password, role } = req.body;
@@ -100,8 +101,46 @@ export const login = async (req, res) => {
   }
 };
 
-export const logout = async () => {
+export const logout = async (req, res) => {
   try {
+    // future mai jo token aa rha use na ho once user logout
+
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1]; // extract the token part
+      console.log("Token:", token);
+
+      // first verify the token  which done through middleware, so no one can populate my redis database with false token
+      
+      const payload = jwt.decode(token);
+      console.log(payload);
+      // eg. what you send at the time jwt.sign
+      // userID: '67d70cbf67f9cb52e01d5ac3',
+      // username: 'Harsh',
+      // role: 'admin',
+      // iat: 1744735394,
+      // exp: 1744736294
+
+      await client.set(`token:${token}`, "blocked");
+      await client.expireAt(`token:${token}`, payload.exp); // above line will tell about validity of token
+    } else {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: No token provided" });
+    }
+
+    //
+    // await client.expire(`token:${token}`,1800)
+    return res
+      .status(200)
+      .cookie("token", "", {
+        maxAge: 0,
+      })
+      .json({
+        success: true,
+        message: "You have logged out successfully",
+      });
   } catch (error) {
     return res.status(500).json({
       success: false,

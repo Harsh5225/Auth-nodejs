@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Upload</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+      }
+
+      .form {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0px 0px 10px rebeccapurple;
+        text-align: center;
+      }
+
+      .form div {
+        margin-bottom: 15px;
+        text-align: left;
+      }
+
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      button {
+        background: rebeccapurple;
+        color: white;
+        border: none;
+        padding: 10px;
+        width: 100%;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background: indigo;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="uploadForm" class="form" enctype="multipart/form-data">
+      <div>
+        <label for="name">Name</label>
+        <input type="text" id="name" placeholder="Enter your name" required />
+      </div>
+      <div>
+        <label for="file">Upload Image</label>
+        <input type="file" id="file" accept="image/*" required />
+      </div>
+      <button type="submit">Upload</button>
+    </form>
+
+    <script>
+      document
+        .getElementById("uploadForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const name = document.getElementById("name").value;
+          const file = document.getElementById("file").files[0];
+
+          if (!file) {
+            alert("Please select an image file.");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("name", name);
+          formData.append("image", file);
+
+          try {
+            const response = await fetch(
+              "http://localhost:8000/app/image/uploadimage",
+              {
+                method: "POST",
+                body: formData,
+              }
+            );
+
+            const result = await response.json();
+            alert(result.message || "Image uploaded successfully!");
+          } catch (error) {
+            console.error("Error uploading image:", error);
+            alert("Failed to upload image.");
+          }
+        });
+    </script>
+  </body>
+</html>

@@ -59,12 +59,20 @@ export const fetchuploadeImage = async (req, res) => {
     const sortObj = {};
     sortObj[sortBy] = sortOrder;
 
+    //db.collection.find().sort({ age: 1 });
+    //This sorts the documents based on the age field in ascending order.
+
+    // sorting of multiple object keys
+    // db.collection.find().sort({ age: 1, name: -1 });
+
+    
+
     const totalImages = await Image.countDocuments();
     const totalPages = Math.ceil(totalImages / limit);
 
     // fetches images with sorting and pagination
 
-    const images= await (await Image.find())
+    const images = await (await Image.find())
       .sort(sortObj)
       .skip(skip)
       .limit(limit);
@@ -137,5 +145,25 @@ export const deleteImage = async (req, res) => {
       error: error,
       message: "Something went wrong!",
     });
+  }
+};
+
+export const uploadImageswithForm = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded!" });
+    }
+
+    // Construct the file URL
+    const fileUrl = `http://localhost:8000/uploads/${req.file.filename}`;
+
+    // Send response with file details
+    res.status(200).json({
+      message: "Image uploaded successfully!",
+      filename: req.file.filename,
+      fileUrl: fileUrl,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

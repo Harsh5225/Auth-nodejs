@@ -4,7 +4,7 @@
 //   try {
 //     const authHeader = req.headers["authorization"];
 //     console.log(authHeader);
-//     
+//
 
 //     const token = authHeader && authHeader.split(" ")[1];
 //     if (!token) {
@@ -32,9 +32,8 @@
 
 // export default isAuthenticate;
 
-
 import jwt from "jsonwebtoken";
-
+import client from "../database/redisdb.js";
 const isAuthenticate = async (req, res, next) => {
   try {
     // Fix: Use "authorization" instead of "authorisation"
@@ -51,6 +50,11 @@ const isAuthenticate = async (req, res, next) => {
 
     // Extract token after "Bearer "
     const token = authHeader.split(" ")[1];
+
+    const isBlocked = await client.exists(`token:${token}`);
+    if (isBlocked) {
+      throw new Error("Token has been revoked or is invalid");
+    }
 
     // Verify token
     const decode = jwt.verify(token, process.env.SECRET_KEY);
