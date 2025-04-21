@@ -1,181 +1,125 @@
+# Image Upload & Authentication Backend
 
+This is a Node.js backend project that provides secure image upload functionality with authentication and role-based access control. The backend is built using Express.js, MongoDB, and Cloudinary for cloud storage, ensuring smooth and efficient handling of images.
 
----
+## Features
 
-```markdown
-# 🔐 Secure Authentication Backend with Redis Token Blacklisting & Image Upload System
+- **User Authentication**: Register, login, and logout users securely.
+- **Role-Based Access Control**: Restrict certain actions based on user roles (Admin/User).
+- **Image Upload**: Upload images to Cloudinary via multer middleware.
+- **Fetch Uploaded Images**: Implement pagination and sorting while fetching images.
+- **Delete Images**: Admin users can delete uploaded images.
+- **Password Management**: Change password functionality for authenticated users.
+- **Deployment**: Successfully deployed on both **Vercel** and **Render**, showcasing deployment expertise.
+- **Error Handling**: Logs authentication failures, file upload errors, and database connection issues.
 
-This project combines **JWT authentication with Redis-based token blacklisting** and **secure image upload functionality** using Cloudinary. It ensures robust, scalable, and secure handling of user sessions, image storage, and role-based access control.
+## Tech Stack
 
-## 🚀 New Feature: Redis Token Blacklisting
+- **Node.js** (Backend framework)
+- **Express.js** (Web framework for routing and middleware management)
+- **MongoDB & Mongoose** (Database & ORM for storing user and image data)
+- **Cloudinary** (Image storage and management)
+- **JWT (JSON Web Token)** (Authentication and authorization)
+- **Multer** (File upload middleware)
+- **bcrypt.js** (Password hashing for security)
+- **Vercel & Render** (Cloud deployment platforms)
+![Image Diagram Flow](https://github.com/Harsh5225/Auth-nodejs/blob/main/diagram.png)
 
-To ensure secure logout functionality even with stateless JWTs, Redis is integrated to blacklist tokens post-logout.
-
-### ✅ Key Benefits
-- **Stateless + Secure**: Adds a session-like control to JWT without losing stateless benefits.
-- **Prevents Reuse**: Logged out or invalidated tokens can't be reused maliciously.
-- **Redis TTL**: Automatically removes blacklisted tokens when they expire.
-
-### 🔁 Workflow
-
-1. **Login**:
-   - User receives a JWT after authentication.
-2. **Authenticated Requests**:
-   - Middleware checks Redis to ensure token isn't blacklisted.
-3. **Logout**:
-   - JWT is stored in Redis with TTL equal to its remaining validity.
-   - Future requests with this token are denied.
-
-### 📈 Flow Diagram
-![Flow Diagram](./assets/token-blacklist-flow.png)
-> *(Make sure this image exists in your `assets/` folder or update the path)*
-
----
-
-# 🖼️ Image Upload & Authentication Backend
-
-This is a Node.js backend project that provides secure image upload functionality with authentication and role-based access control. Built using **Express.js**, **MongoDB**, and **Cloudinary**, it enables efficient image handling with scalable authentication.
-
-## 🔧 Features
-
-- 🔐 **User Authentication**: Register, login, logout, change password.
-- 🧑‍💼 **Role-Based Access**: Different permissions for Admins and Users.
-- ☁️ **Cloudinary Integration**: Store images in the cloud.
-- 📦 **Redis Blacklist**: Secure logout functionality.
-- 🔄 **Pagination + Sorting**: Fetch uploaded images in an organized manner.
-- 🗑️ **Image Deletion**: Admin-only image removal.
-- ⚙️ **Error Logging**: Logs failures in auth, uploads, and DB connections.
-- 🚀 **Deployment Ready**: Hosted on **Vercel** & **Render**.
-
----
-
-## 🛠 Tech Stack
-
-- **Node.js** – Backend runtime
-- **Express.js** – Routing & Middleware
-- **MongoDB + Mongoose** – NoSQL database and ORM
-- **Cloudinary** – Cloud image storage
-- **JWT** – Token-based authentication
-- **Redis** – In-memory token blacklist store
-- **Multer** – File handling middleware
-- **bcrypt.js** – Password hashing
-- **Vercel + Render** – Deployment platforms
-
----
-
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
+Ensure you have the following installed:
 - [Node.js](https://nodejs.org/)
-- [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-- [Redis](https://redis.io/)
+- [MongoDB](https://www.mongodb.com/)
 
-### Setup Instructions
+### Steps to Run the Project
 
-```bash
-# 1. Clone the repo
-git clone https://github.com/yourusername/your-repo-name.git
-cd your-repo-name
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/yourusername/your-repo-name.git
+   cd your-repo-name
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Create a `.env` file and add the following environment variables:
+   ```env
+   PORT=5000
+   MONGO_URI=your_mongodb_connection_string
+   SECRET_KEY=your_jwt_secret_key
+   CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+   CLOUDINARY_API_KEY=your_cloudinary_api_key
+   CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+   ```
+4. Start the server:
+   ```sh
+   npm start
+   ```
 
-# 2. Install dependencies
-npm install
+## API Endpoints
 
-# 3. Configure environment variables in .env
-```
+### Authentication
 
-#### `.env` Example:
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-SECRET_KEY=your_jwt_secret_key
-REDIS_URL=redis://localhost:6379
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-```
+| Method | Endpoint        | Description |
+|--------|----------------|-------------|
+| POST   | `/api/auth/register` | Register a new user |
+| POST   | `/api/auth/login`    | Login user and get JWT token |
+| GET    | `/api/auth/logout`   | Logout user |
+| POST   | `/api/auth/change`   | Change password (Authenticated users) |
 
-```bash
-# 4. Start the server
-npm start
-```
+### Image Management
 
----
+| Method | Endpoint            | Description |
+|--------|--------------------|-------------|
+| GET    | `/api/image/fetch` | Fetch all uploaded images with pagination & sorting (Authenticated users) |
+| POST   | `/api/image/upload` | Upload an image (Only Admin users) |
+| DELETE | `/api/image/:id`    | Delete an image (Only Admin users) |
 
-## 🔗 API Endpoints
+## Middleware
 
-### 🔐 Authentication
+- **`isAuthenticate`**: Protects routes by ensuring only authenticated users can access them.
+- **`isAdminUser`**: Ensures only admin users can upload and delete images.
+- **`uploadMiddleware`**: Handles image uploads using `multer`.
 
-| Method | Endpoint               | Description                       |
-|--------|------------------------|-----------------------------------|
-| POST   | `/api/auth/register`   | Register a new user               |
-| POST   | `/api/auth/login`      | Login user and receive JWT        |
-| GET    | `/api/auth/logout`     | Logout and blacklist JWT          |
-| POST   | `/api/auth/change`     | Change password (Authenticated)   |
+## Deployment
 
-### 🖼 Image Management
+The application is deployed on both **Vercel** and **Render**, demonstrating proficiency in cloud deployment.
 
-| Method | Endpoint               | Description                       |
-|--------|------------------------|-----------------------------------|
-| GET    | `/api/image/fetch`     | Fetch uploaded images (paginated)|
-| POST   | `/api/image/upload`    | Upload image (Admin only)         |
-| DELETE | `/api/image/:id`       | Delete image (Admin only)         |
+- **Vercel Deployment:** [https://authenticationnodejs.vercel.app/](https://authenticationnodejs.vercel.app/)
+- **Render Deployment:** [https://auth-nodejs-5sul.onrender.com](https://auth-nodejs-5sul.onrender.com)
 
----
+## Common Deployment Issues
 
-## 🔐 Middleware Breakdown
+### Problem: Mongoose Timeout after Deployment
 
-- `isAuthenticate`: Verifies JWT and checks Redis blacklist.
-- `isAdminUser`: Allows only admins to perform certain actions.
-- `uploadMiddleware`: Uses `multer` to handle image uploads.
-
----
-
-## 🗃 Folder Structure
-```
-├── controllers      # Business logic
-├── middlewares      # Authentication, role checks, upload handler
-├── models           # Mongoose models (User, Image)
-├── routes           # Auth & image APIs
-├── utils            # Redis client and helper functions
-├── config           # Cloudinary configuration
-├── helpers          # Upload helpers, response formatters
-├── .env             # Environment configs (not committed)
-├── server.js        # Main entry
-├── vercel.json      # Vercel deployment config
-```
-
----
-
-## ☁️ Deployment
-
-- ✅ **Vercel**: [https://authenticationnodejs.vercel.app/](https://authenticationnodejs.vercel.app/)
-- ✅ **Render**: [https://auth-nodejs-5sul.onrender.com](https://auth-nodejs-5sul.onrender.com)
-
----
-
-## ⚠️ Common Deployment Issues
-
-### ❌ Mongoose Timeout
 **Error:**
 ```
-MongooseError: Operation `users.findOne()` buffering timed out after 10000ms
+Error in user registration: MongooseError: Operation `users.findOne()` buffering timed out after 10000ms
 ```
+**Cause:**
+This happens because the MongoDB server is not allowing access from all networks. When deploying to cloud platforms like Vercel or Render, ensure that your MongoDB database allows external connections from the deployment environment.
 
-**Fix:**
-- Update **MongoDB Atlas IP whitelist** to `0.0.0.0/0`
-- Ensure correct URI is provided in `.env`
+**Solution:**
+- Update the **IP Whitelist** in MongoDB Atlas to allow access from all IPs (`0.0.0.0/0`).
+- Check if your **MONGO_URI** is correctly configured in the environment variables.
 
----
-
-## 🤝 Contributions
-
-We welcome contributions and suggestions. Open an issue or submit a PR for improvements.
-
----
-
-## 🪪 License
-
-MIT License – feel free to use, share, and contribute.
+## Folder Structure
 ```
+├── controllers  # Business logic for authentication and image management
+├── models       # Mongoose schema models (User, Image)
+├── middlewares  # Authentication and file upload middleware
+├── config       # Cloudinary configuration
+├── routes       # API route definitions
+├── helpers      # Helper functions (Cloudinary upload helper)
+├── .env         # Environment variables (not committed)
+├── server.js    # Entry point of the application
+├── vercel.json  # Configuration for Vercel deployment
+``` 
 
----
+## Contributions
+Contributions are welcome! If you find any bugs or have feature requests, feel free to open an issue or submit a pull request.
+
+## License
+This project is open-source and available under the [MIT License](LICENSE).
+

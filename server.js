@@ -6,15 +6,19 @@ import Homeroutes from "./routes/Homeroutes.js";
 import Adminroutes from "./routes/Adminroutes.js";
 import uploadImageRouter from "./routes/imageroutes.js";
 import client from "./database/redisdb.js";
+import rateLimiter from "./middlewares/rate-limiter.js";
+import slidingWindowRateLimiter from "./middlewares/slidingWindowratlimiter.js";
 const app = express();
 
 dotenv.config();
 // connectDB();
 // middleware for parsing
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3000;
 //
+
 app.use("/app/auth", userRoutes);
 app.use("/app/home", Homeroutes);
 app.use("/app/admin", Adminroutes);
@@ -33,6 +37,7 @@ const main = async () => {
     console.log("mongoDb is connected");
     console.log("Redis is connected");
 
+    // app.use(rateLimiter);
     app.listen(PORT, () => {
       console.log(`Server is running at ${PORT}`);
     });
