@@ -71,7 +71,7 @@ Even though JWTs are stateless, you still need a way to **invalidate tokens** af
 
 ### 🔁 Flow Diagram
 
-![Token Blacklist Flow](./assets/token-blacklist-flow.png)
+![Image Diagram Flow](https://github.com/Harsh5225/Auth-nodejs/blob/main/diagram.png)
 
 ---
 
